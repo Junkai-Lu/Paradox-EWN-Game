@@ -11,14 +11,16 @@ enum PIECE
 };
 
 #define SIZE 10
+typedef short sint;
+using BoardArray = sint[SIZE][SIZE];
 
 //define basic class.
 class Loc
 {
 public:
-	int x;
-	int y;
-	virtual void Set(int lx, int ly)
+	sint x;
+	sint y;
+	virtual void Set(sint lx, sint ly)
 	{
 		x = lx;
 		y = ly;
@@ -29,30 +31,66 @@ class Move:Loc
 {
 public:
 	Loc loc;
-	int piece;
-	virtual void Set(int lx, int ly, int lp)
+	sint piece;
+	virtual void Set(sint lx, sint ly, sint lp)
 	{
 		loc.Set(lx, ly);
 		piece = lp;
 	}
-	void Show();
+	void Move::Show()
+	{
+		cout << "Location(" << loc.x + 1 << " " << loc.y + 1 << ") Piece ";
+		if (piece>0)
+			CprintNum(piece,12);
+		else
+			CprintNum(-piece,9);
+		cout << endl;
+	}
 };
 
-typedef short sint;
-using BoardArray = sint[SIZE][SIZE];
+//define chessboard class
+
 
 class Board
 {
-public:
+protected:
 	//data
 	BoardArray board;
-	unsigned short Step;
+	short step;
 
+public:
 	//constructor function
 	Board();
-	Board::Board(BoardArray board_array, unsigned short step);
-	Board(BoardArray board_array, Move next_move, unsigned short step);
+	Board(BoardArray board_array, Move next_move, short board_step);
 
+	
+	inline void StepAdd()
+	{
+		step++;
+	}
+	inline short GetStep()
+	{
+		return step;
+	}
+	inline bool Equal(int px, int py, int p)
+	{
+		if (board[px][py] == p)
+			return true;
+		return false;
+	}
+	void GameMove(Loc move_loc, int piece);
+	void GameMove(Move move);
+	void SetBoard(BoardArray board_array);
+
+
+private:
+	void Init();
+
+
+
+
+
+public:
 	Loc GetPieceLoc(int Piece);
 	bool GetPieceLife(int Piece);
 	bool GetLocLegality(Loc pLoc);
@@ -64,7 +102,7 @@ public:
 	void Print();
 	void Show();
 	int Winner();
-	void Move(Loc mLoc,int Piece);
+	
 	void Define(int x,int y,int Piece);
 	void Formation(int faction,int formation);
 
@@ -74,13 +112,13 @@ public:
 
 	int GetPieceFixFilterMoves(Move Moves[3],int Piece);
 	int GetFixFilterMoves(Move Moves[6],int Piece);
+
+
 };
 
-//基础函数
-bool GetFormationLegality(int asp);
-int RndFormation();
+//basic func
 int RndDice();
-
-//彩色函数
+int RndFormation();
+bool GetFormationLegality(int asp);
 void Cprintf(char* str, WORD color, ...);
-void cprintNum(int color,int Num);
+void CprintNum(int num,int color);

@@ -7,61 +7,44 @@
 
 using namespace std;
 
-Move Move::Create(int x,int y,int Piece)
-{
-	Move nMove;
-	nMove.Loc = Loc.Create(x,y);
-	nMove.Piece = Piece;
-	return nMove;
-}
-void Move::Show()
-{
-	cout<<"坐标( "<<Loc.x+1<<" "<<Loc.y+1<<" )，棋子";
-	if(Piece>0)
-		cprintNum(12,Piece);
-	else
-		cprintNum(9,-Piece);
-	cout<<endl;
-}
+
 
 //Board
 Board::Board()
 {
-	//初始化棋盘
-	Step =0;
-	for(int i=0;i<SIZE;i++)
-	{
-		for(int j=0;j<SIZE;j++)
-		{
-			board[j][i] = 0;
-		}
-	}
+	//initialize board.
+	step =0;
+	Init();
 }
-Board::Board(int Array[SIZE][SIZE],int step)
+Board::Board(BoardArray board_array, Move next_move, short board_step)
 {
-	//初始化棋盘
-	Step =step;
-	for(int i=0;i<SIZE;i++)
-	{
-		for(int j=0;j<SIZE;j++)
-		{
-			board[j][i] = Array[j][i];
-		}
-	}
+	step = board_step;
+	SetBoard(board_array);
+	Move(next_move);
 }
-Board::Board(int Array[SIZE][SIZE],int Piece,Loc mLoc,int step)
+
+void Board::GameMove(Loc move_loc, int piece)
 {
-	Step = step;
-	//Step = step+1;//传入的时候自增1
-	for(int i=0;i<SIZE;i++)
-	{
-		for(int j=0;j<SIZE;j++)
-		{
-			board[j][i] = Array[j][i];
-		}
-	}
-	Move(mLoc,Piece);
+	step++;
+	Loc old_loc = GetPieceLoc(piece);
+	board[old_loc.x][old_loc.y] = EMPTY;
+	board[move_loc.x][move_loc.y] = piece;
 }
+void Board::GameMove(Move move)
+{
+	step++;
+	Loc old_loc = GetPieceLoc(move.piece);
+	board[old_loc.x][old_loc.y] = EMPTY;
+	board[move.loc.x][move.loc.y] = move.piece;
+}
+void Board::SetBoard(BoardArray board_array)
+{
+	for (int i = 0; i<SIZE; i++)
+		for (int j = 0; j<SIZE; j++)
+			board[j][i] = board_array[j][i];
+}
+
+
 Loc Board::GetPieceLoc(int Piece)
 {
 	//获得棋子的点坐标。返回值为Loc类型
@@ -259,12 +242,12 @@ void Board::Print()
 	Cprintf("\n┌┄┬┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐\n┆",15);
 	if(Step<10)
 	{
-		cprintNum(14,0);
-		cprintNum(14,Step);
+		CprintNum(0,14);
+		CprintNum(Step,14);
 	}
 	else
 	{
-		cprintNum(14,Step);
+		CprintNum(Step,14);
 	}
 	Cprintf("┆                            ┆\n├┄┘",15);
 	Cprintf("   1    2    3    4    5",8);
@@ -272,7 +255,7 @@ void Board::Print()
 	for(int i =0;i<SIZE;i++)
 	{
 		printf("┆   ");
-		cprintNum(8,i+1);
+		CprintNum(i+1,8);
 		printf("   ");
 		for(int j =0;j<SIZE;j++)
 		{
@@ -282,11 +265,11 @@ void Board::Print()
 			}
 			else if(board[j][i]>0)
 			{
-				cprintNum(12,board[j][i]);
+				CprintNum(board[j][i],12);
 			}
 			else if(board[j][i]<0)
 			{
-				cprintNum(9,-board[j][i]);
+				CprintNum(-board[j][i],9);
 			}
 			printf("    ");
 		}
@@ -308,9 +291,9 @@ void Board::Show()
 			if(board[j][i]==0)
 				cout<<" ";
 			if(board[j][i]>0)
-				cprintNum(12,board[j][i]);
+				CprintNum(board[j][i],12);
 			if(board[j][i]<0)
-				cprintNum(9,-board[j][i]);
+				CprintNum(-board[j][i],9);
 		}
 		cout<<"\n";
 	}
@@ -336,13 +319,7 @@ int Board::Winner()
 		return RED;
 	return 0;
 }
-void Board::Move(Loc mLoc,int Piece)
-{
-	Step++;
-	Loc oLoc = GetPieceLoc(Piece);
-	board[oLoc.x][oLoc.y] = EMPTY;
-	board[mLoc.x][mLoc.y] = Piece;
-}
+
 void Board::Define(int x,int y,int Piece)
 {
 	board[x][y] = Piece;
@@ -800,26 +777,76 @@ int Board::GetFixFilterMoves(Move Moves[6],int Piece)
 	}
 	return MoveNum;
 }
-//Formation
+
+
+void Board::Init()
+{
+	for (int y = 0; y < SIZE; y++)
+		for (int x = 0; x < SIZE; x++)
+			board[x][y] = EMPTY;
+	//RED
+	board[0][0] = 1;
+	board[1][0] = 2;
+	board[2][0] = 3;
+	board[0][1] = 4;
+	board[1][1] = 5;
+	board[0][2] = 6;
+
+	//BLUE
+	board[SIZE - 1][SIZE - 1] = -1;
+	board[SIZE - 2][SIZE - 1] = -2;
+	board[SIZE - 3][SIZE - 1] = -3;
+	board[SIZE - 1][SIZE - 2] = -4;
+	board[SIZE - 2][SIZE - 2] = -5;
+	board[SIZE - 1][SIZE - 3] = -6;
+}
+
+
+//Basic Func
+int RndDice()
+{
+	int die = rand() % 6 + 1;
+	return die;
+}
+int RndFormation()
+{
+	int asp, n;
+	int r[6] = { 1, 2, 3, 4, 5, 6 };
+	n = rand() % 6;
+	asp = r[n];
+	r[n] = 0;
+	for (;;)
+	{
+		n = rand() % 6;
+		if (r[n]>0)
+		{
+			asp = asp * 10 + r[n];
+			r[n] = 0;
+		}
+		if (asp >= 123456 && asp <= 654321)
+			break;
+	}
+	return asp;
+}
 bool GetFormationLegality(int asp)
 {
-	if(asp<=654321&&asp>=123456)
+	if (asp <= 654321 && asp >= 123456)
 	{
 		int px = asp;
-		int six = px%10;
-		px = (px - six)/10;
-		int five = px%10;
-		px = (px - five)/10;
-		int four = px%10;
-		px = (px - four)/10;
-		int three  = px%10;
-		px = (px - three)/10;
-		int two = px%10;
-		px = (px - two)/10;
-		int one  = px%10;
-		if(1<=one&&one<=6&&1<=two&&two<=6&&1<=three&&three<=6&&1<=four&&four<=6&&1<=five&&five<=6&&1<=six&&six<=6)
+		int six = px % 10;
+		px = (px - six) / 10;
+		int five = px % 10;
+		px = (px - five) / 10;
+		int four = px % 10;
+		px = (px - four) / 10;
+		int three = px % 10;
+		px = (px - three) / 10;
+		int two = px % 10;
+		px = (px - two) / 10;
+		int one = px % 10;
+		if (1 <= one&&one <= 6 && 1 <= two&&two <= 6 && 1 <= three&&three <= 6 && 1 <= four&&four <= 6 && 1 <= five&&five <= 6 && 1 <= six&&six <= 6)
 		{
-			if(one!=two&&one!=three&&one!=four&&one!=five&&one!=six&&two!=three&&two!=four&&two!=five&&two!=six&&three!=four&&three!=five&&three!=six&&four!=five&&four!=six&&five!=six)
+			if (one != two&&one != three&&one != four&&one != five&&one != six&&two != three&&two != four&&two != five&&two != six&&three != four&&three != five&&three != six&&four != five&&four != six&&five != six)
 			{
 				return true;
 			}
@@ -827,33 +854,7 @@ bool GetFormationLegality(int asp)
 	}
 	return false;
 }
-int RndDice()
-{
-	int die=rand()%6+1;
-	return die;
-}
-int RndFormation()
-{
-	int asp,n;
-	int r[6] = {1,2,3,4,5,6};
-	n = rand()%6;
-	asp = r[n];
-	r[n] = 0;
-	for(;;)
-	{
-		n = rand()%6;
-		if(r[n]>0)
-		{
-			asp = asp*10+r[n];
-			r[n] = 0;
-		}
-		if(asp>=123456&&asp<=654321)
-			break;
-	}
-	return asp;
-}
 
-//ColorPrintf
 void Cprintf(char* str, WORD color, ...) {
 	WORD colorOld;
 	HANDLE handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
@@ -877,7 +878,7 @@ void Cprintf(char* str, WORD color, ...) {
 	Cprintf("!", 4);//棕
 	*/
 }
-void cprintNum(int color,int Num)
+void CprintNum(int num, int color)
 {
 	char str[4];
 	sprintf(str,"%d",Num);
