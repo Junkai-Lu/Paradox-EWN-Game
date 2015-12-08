@@ -59,11 +59,17 @@ protected:
 	short step;
 
 public:
-	//constructor function
-	Board();
-	Board(BoardArray board_array, Move next_move, short board_step);
-
 	
+	Board();												//constructor function
+	Board(BoardArray b_arr, Move b_move, short b_step);		//constructor function
+	void GameMove(Loc move_loc, int piece);					//excute a move
+	void GameMove(Move move);								//excute a move(overloaded)
+	void SetBoard(BoardArray board_array);					//set the board
+	void Print();											//print the board
+	void Show();											//a simpilified print
+	int Winner();											//return the winner of this board.	
+	void DefineFormation(int faction, int formation);		//define the initial piece formation
+
 	inline void StepAdd()
 	{
 		step++;
@@ -78,38 +84,26 @@ public:
 			return true;
 		return false;
 	}
-	void GameMove(Loc move_loc, int piece);
-	void GameMove(Move move);
-	void SetBoard(BoardArray board_array);
-
+	inline void Define(int x, int y, int value)
+	{
+		board[x][y] = value;
+	}
 
 private:
-	void Init();
-
-
-
-
+	void Init();											//initialized board with formation 123456
+	Loc GetPieceLoc(int piece);								//return the loction of piece.
+	bool GetPieceLife(int piece);							//return whether the piece alive.
+	bool GetLocLegality(Loc loc);							//return whether the location is legal.
+	int GetPieceFaction(int piece);							//return the faction of piece.
+	int GetLargerPiece(int piece);							//return a piece with a larger number which is alive. 
+	int GetSmallerPiece(int piece);							//return a piece with a smaller number which is alive. 
 
 public:
-	Loc GetPieceLoc(int Piece);
-	bool GetPieceLife(int Piece);
-	bool GetLocLegality(Loc pLoc);
-	int GetPieceFaction(int Piece);
-	int GetLargerPiece(int Piece);
-	int GetSmallerPiece(int Piece);
-	int GetAllMoves(Move Moves[6],int Piece);
-
-	void Print();
-	void Show();
-	int Winner();
 	
-	void Define(int x,int y,int Piece);
-	void Formation(int faction,int formation);
-
+	int GetAllMoves(Move Moves[6],int Piece);
 	bool GetLocationThreat(Loc pLoc,int faction);
 	int GetPieceFilterMoves(Move Moves[3],int Piece);
 	int GetFilterMoves(Move Moves[6],int Piece);
-
 	int GetPieceFixFilterMoves(Move Moves[3],int Piece);
 	int GetFixFilterMoves(Move Moves[6],int Piece);
 

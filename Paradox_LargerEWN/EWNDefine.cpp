@@ -16,13 +16,14 @@ Board::Board()
 	step =0;
 	Init();
 }
-Board::Board(BoardArray board_array, Move next_move, short board_step)
+Board::Board(BoardArray b_arr, Move b_move, short b_step)
 {
-	step = board_step;
-	SetBoard(board_array);
-	Move(next_move);
+	step = b_step;
+	SetBoard(b_arr);
+	Move(b_move);
 }
 
+//public
 void Board::GameMove(Loc move_loc, int piece)
 {
 	step++;
@@ -43,60 +44,197 @@ void Board::SetBoard(BoardArray board_array)
 		for (int j = 0; j<SIZE; j++)
 			board[j][i] = board_array[j][i];
 }
-
-
-Loc Board::GetPieceLoc(int Piece)
+void Board::Print()
 {
-	//获得棋子的点坐标。返回值为Loc类型
-	Loc nLoc;
+	//打印出棋盘=============================================
+	Cprintf("\n┌┄┬┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐\n┆", 15);
+	if (step<10)
+	{
+		CprintNum(0, 14);
+		CprintNum(step, 14);
+	}
+	else
+	{
+		CprintNum(step, 14);
+	}
+	Cprintf("┆                            ┆\n├┄┘", 15);
+	Cprintf("   1    2    3    4    5", 8);
+	Cprintf("    ┆\n┆                                ┆\n", 15);
+	for (int i = 0; i<SIZE; i++)
+	{
+		printf("┆   ");
+		CprintNum(i + 1, 8);
+		printf("   ");
+		for (int j = 0; j<SIZE; j++)
+		{
+			if (board[j][i] == 0)
+			{
+				printf(" ");
+			}
+			else if (board[j][i]>0)
+			{
+				CprintNum(board[j][i], 12);
+			}
+			else if (board[j][i]<0)
+			{
+				CprintNum(-board[j][i], 9);
+			}
+			printf("    ");
+		}
+		printf("┆\n┆                                ┆\n");
+
+	}
+	Cprintf("┆                                ┆\n", 15);
+	Cprintf("└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘\n", 15);
+}
+void Board::Show()
+{
+	cout << "\n-----------------\n   1  2  3  4  5\n";
+	for (int i = 0; i<SIZE; i++)
+	{
+		cout << i + 1;
+		for (int j = 0; j<SIZE; j++)
+		{
+			cout << "  ";
+			if (board[j][i] == 0)
+				cout << " ";
+			if (board[j][i]>0)
+				CprintNum(board[j][i], 12);
+			if (board[j][i]<0)
+				CprintNum(-board[j][i], 9);
+		}
+		cout << "\n";
+	}
+	cout << "\n-----------------\n";
+}
+int Board::Winner()
+{
+	if (board[0][0] < 0)
+		return BLUE;
+	if (board[SIZE - 1][SIZE - 1] > 0)
+		return RED;
+	int red = 0, blue = 0;
+	for (int i = 0; i<SIZE; i++)
+	{
+		for (int j = 0; j<SIZE; j++)
+		{
+			if (board[j][i] >0)
+				red++;
+			if (board[j][i] <0)
+				blue++;
+		}
+	}
+	if (red == 0)
+		return BLUE;
+	if (blue == 0)
+		return RED;
+	return 0;
+}
+
+void Board::DefineFormation(int faction, int formation)
+{
+	int px = formation;
+	int six = px % 10;
+	px = (px - six) / 10;
+	int five = px % 10;
+	px = (px - five) / 10;
+	int four = px % 10;
+	px = (px - four) / 10;
+	int three = px % 10;
+	px = (px - three) / 10;
+	int two = px % 10;
+	px = (px - two) / 10;
+	int one = px % 10;
+	if (faction == RED)
+	{
+		Define(0, 0, one);
+		Define(1, 0, two);
+		Define(2, 0, three);
+		Define(0, 1, four);
+		Define(1, 1, five);
+		Define(0, 2, six);
+	}
+	else
+	{
+		Define(SIZE - 1, SIZE - 1, -one);
+		Define(SIZE - 2, SIZE - 1, -two);
+		Define(SIZE - 3, SIZE - 1, -three);
+		Define(SIZE - 1, SIZE - 2, -four);
+		Define(SIZE - 2, SIZE - 2, -five);
+		Define(SIZE - 1, SIZE - 3, -six);
+	}
+}
+
+//private
+void Board::Init()
+{
+	for (int y = 0; y < SIZE; y++)
+		for (int x = 0; x < SIZE; x++)
+			board[x][y] = EMPTY;
+	//RED
+	board[0][0] = 1;
+	board[1][0] = 2;
+	board[2][0] = 3;
+	board[0][1] = 4;
+	board[1][1] = 5;
+	board[0][2] = 6;
+
+	//BLUE
+	board[SIZE - 1][SIZE - 1] = -1;
+	board[SIZE - 2][SIZE - 1] = -2;
+	board[SIZE - 3][SIZE - 1] = -3;
+	board[SIZE - 1][SIZE - 2] = -4;
+	board[SIZE - 2][SIZE - 2] = -5;
+	board[SIZE - 1][SIZE - 3] = -6;
+}
+Loc Board::GetPieceLoc(int piece)
+{
+	Loc new_loc;
 	for(int i =0;i<SIZE;i++)
 	{
 		for(int j =0;j<SIZE;j++)
 		{
-			if(board[j][i] == Piece)
+			if(board[j][i] == piece)
 			{
-				nLoc.x = j;
-				nLoc.y = i;
-				return nLoc;
+				new_loc.Set(j, i);
+				return new_loc;
 			}
 		}
 	}
-	nLoc.x = 0;
-	nLoc.y = 0;
-	return nLoc;
+	new_loc.Set(0, 0);
+	return new_loc;
 }
-bool Board::GetPieceLife(int Piece)
+bool Board::GetPieceLife(int piece)
 {
-	//确定一个棋子是否存活
 	for(int i =0;i<SIZE;i++)
 	{
 		for(int j =0;j<SIZE;j++)
 		{
-			if(board[j][i] == Piece)
+			if(board[j][i] == piece)
 				return true;
 		}
 	}
 	return false;
 }
-bool Board::GetLocLegality(Loc pLoc)
+bool Board::GetLocLegality(Loc loc)
 {
-	if(pLoc.x>=0&&pLoc.x<=4&&pLoc.y>=0&&pLoc.y<=4)
+	if(loc.x>=0&&loc.x<=SIZE-1&&loc.y>=0&&loc.y<=SIZE-1)
 		return true;
 	return false;
 }
-int Board::GetPieceFaction(int Piece)
+int Board::GetPieceFaction(int piece)
 {
-	if(Piece>0)
+	if(piece>0)
 		return RED;
-	if(Piece<0)
+	if(piece<0)
 		return BLUE;
 	return 0;
 }
-int Board::GetLargerPiece(int Piece)
+int Board::GetLargerPiece(int piece)
 {
-	if(Piece>0)
+	if(piece>0)
 	{
-		for(int i=Piece;i<=6;i++)
+		for(int i=piece;i<=6;i++)
 		{
 			if(GetPieceLife(i)==true)
 			{
@@ -107,7 +245,7 @@ int Board::GetLargerPiece(int Piece)
 	}
 	else
 	{
-		for(int i=Piece;i>=-6;i--)
+		for(int i=piece;i>=-6;i--)
 		{
 			if(GetPieceLife(i)==true)
 			{
@@ -117,11 +255,11 @@ int Board::GetLargerPiece(int Piece)
 		return 0;
 	}
 }
-int Board::GetSmallerPiece(int Piece)
+int Board::GetSmallerPiece(int piece)
 {
-	if(Piece>0)
+	if(piece>0)
 	{
-		for(int i=Piece;i>=1;i--)
+		for(int i=piece;i>=1;i--)
 		{
 			if(GetPieceLife(i)==true)
 			{
@@ -132,7 +270,7 @@ int Board::GetSmallerPiece(int Piece)
 	}
 	else
 	{
-		for(int i=Piece;i<=-1;i++)
+		for(int i=piece;i<=-1;i++)
 		{
 			if(GetPieceLife(i)==true)
 			{
@@ -142,6 +280,9 @@ int Board::GetSmallerPiece(int Piece)
 		return 0;
 	}
 }
+
+
+
 int Board::GetAllMoves(Move Moves[6],int Piece)
 {
 	int Direction[3][2] = {{1,0},{1,1},{0,1}};
@@ -236,127 +377,10 @@ int Board::GetAllMoves(Move Moves[6],int Piece)
 	}
 	return MoveNum;
 }
-void Board::Print()
-{
-	//打印出棋盘=============================================
-	Cprintf("\n┌┄┬┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐\n┆",15);
-	if(Step<10)
-	{
-		CprintNum(0,14);
-		CprintNum(Step,14);
-	}
-	else
-	{
-		CprintNum(Step,14);
-	}
-	Cprintf("┆                            ┆\n├┄┘",15);
-	Cprintf("   1    2    3    4    5",8);
-	Cprintf("    ┆\n┆                                ┆\n",15);
-	for(int i =0;i<SIZE;i++)
-	{
-		printf("┆   ");
-		CprintNum(i+1,8);
-		printf("   ");
-		for(int j =0;j<SIZE;j++)
-		{
-			if(board[j][i]==0)
-			{
-				printf(" ");
-			}
-			else if(board[j][i]>0)
-			{
-				CprintNum(board[j][i],12);
-			}
-			else if(board[j][i]<0)
-			{
-				CprintNum(-board[j][i],9);
-			}
-			printf("    ");
-		}
-		printf("┆\n┆                                ┆\n");
 
-	}
-	Cprintf("┆                                ┆\n",15);
-	Cprintf("└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘\n",15);
-}
-void Board::Show()
-{
-	cout<<"\n-----------------\n   1  2  3  4  5\n";
-	for(int i =0;i<SIZE;i++)
-	{
-		cout<<i+1;
-		for(int j =0;j<SIZE;j++)
-		{
-			cout<<"  ";
-			if(board[j][i]==0)
-				cout<<" ";
-			if(board[j][i]>0)
-				CprintNum(board[j][i],12);
-			if(board[j][i]<0)
-				CprintNum(-board[j][i],9);
-		}
-		cout<<"\n";
-	}
-	cout<<"\n-----------------\n";
-}
-int Board::Winner()
-{
-	//返回值为-1,0,1  -1为蓝方胜，0为未胜利，1为红方胜
-	int red = 0,blue =0;
-	for(int i =0;i<SIZE;i++)
-	{
-		for(int j =0;j<SIZE;j++)
-		{
-			if(board[j][i] >0)
-				red++;
-			if(board[j][i] <0)
-				blue++;
-		}
-	}
-	if(board[0][0]<0||red==0)
-		return BLUE;
-	if(board[4][4]>0||blue==0)
-		return RED;
-	return 0;
-}
 
-void Board::Define(int x,int y,int Piece)
-{
-	board[x][y] = Piece;
-}
-void Board::Formation(int faction,int formation)
-{
-	int px = formation;
-	int six = px%10;
-	px = (px - six)/10;
-	int five = px%10;
-	px = (px - five)/10;
-	int four = px%10;
-	px = (px - four)/10;
-	int three  = px%10;
-	px = (px - three)/10;
-	int two = px%10;
-	px = (px - two)/10;
-	int one  = px%10;
-	if(faction ==RED)
-	{
-		Define(0,0,one);
-		Define(1,0,two);
-		Define(2,0,three);
-		Define(0,1,four);
-		Define(1,1,five);
-		Define(0,2,six);
-	}
-	else
-	{
-		Define(SIZE-1,SIZE-1,-one);
-		Define(SIZE-2,SIZE-1,-two);
-		Define(SIZE-3,SIZE-1,-three);
-		Define(SIZE-1,SIZE-2,-four);
-		Define(SIZE-2,SIZE-2,-five);
-		Define(SIZE-1,SIZE-3,-six);
-	}
-}
+
+
 bool Board::GetLocationThreat(Loc pLoc,int faction)
 {
 	//获得某方在某个位置上是否受到直接的威胁。范围值为true or false
@@ -779,27 +803,7 @@ int Board::GetFixFilterMoves(Move Moves[6],int Piece)
 }
 
 
-void Board::Init()
-{
-	for (int y = 0; y < SIZE; y++)
-		for (int x = 0; x < SIZE; x++)
-			board[x][y] = EMPTY;
-	//RED
-	board[0][0] = 1;
-	board[1][0] = 2;
-	board[2][0] = 3;
-	board[0][1] = 4;
-	board[1][1] = 5;
-	board[0][2] = 6;
 
-	//BLUE
-	board[SIZE - 1][SIZE - 1] = -1;
-	board[SIZE - 2][SIZE - 1] = -2;
-	board[SIZE - 3][SIZE - 1] = -3;
-	board[SIZE - 1][SIZE - 2] = -4;
-	board[SIZE - 2][SIZE - 2] = -5;
-	board[SIZE - 1][SIZE - 3] = -6;
-}
 
 
 //Basic Func
