@@ -8,6 +8,16 @@
 using namespace std;
 
 
+void Move::Show()
+{
+	std::cout << "Location(" << loc.x + 1 << " " << loc.y + 1 << ") Piece ";
+	if (piece>0)
+		CprintNum(piece, 12);
+	else
+		CprintNum(-piece, 9);
+	std::cout << std::endl;
+}
+
 
 //Board
 Board::Board()
@@ -20,7 +30,7 @@ Board::Board(BoardArray b_arr, Move b_move, short b_step)
 {
 	step = b_step;
 	SetBoard(b_arr);
-	Move(b_move);
+	GameMove(b_move);
 }
 
 //public
@@ -46,8 +56,10 @@ void Board::SetBoard(BoardArray board_array)
 }
 void Board::Print()
 {
-	//打印出棋盘=============================================
-	Cprintf("\n┌┄┬┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐\n┆", 15);
+	Cprintf("\n┌┄┬", 15);
+	for (int i = 0; i < SIZE;i++)
+		Cprintf("┄┄", 15);
+	Cprintf("┄┐\n┆", 15);
 	if (step<10)
 	{
 		CprintNum(0, 14);
@@ -57,39 +69,86 @@ void Board::Print()
 	{
 		CprintNum(step, 14);
 	}
-	Cprintf("┆                            ┆\n├┄┘", 15);
-	Cprintf("   1    2    3    4    5", 8);
-	Cprintf("    ┆\n┆                                ┆\n", 15);
+
+	Cprintf("┆", 15);
+	for (int i = 0; i < SIZE; i++)
+	{
+		cout << "   ";
+		CprintNum(i+1, 8);
+		
+	}
+	cout << "  ";
+
+	Cprintf("┆\n├┄┼", 15);
+	for (int i = 0; i < SIZE; i++)
+	{
+		Cprintf("┄┄", 15);
+	}
+	Cprintf("┄┤", 15);
+
+
+	Cprintf("\n┆  ┆", 15);
+	for (int i = 0; i < SIZE; i++)
+	{
+		Cprintf("    ", 15);
+	}
+	Cprintf("  ┆\n", 15);
+
+
 	for (int i = 0; i<SIZE; i++)
 	{
-		printf("┆   ");
+		printf("┆ ");
 		CprintNum(i + 1, 8);
-		printf("   ");
+		printf("┆  ");
+
 		for (int j = 0; j<SIZE; j++)
 		{
 			if (board[j][i] == 0)
 			{
-				printf(" ");
+				printf("  ");
 			}
 			else if (board[j][i]>0)
 			{
+				cout << " ";
 				CprintNum(board[j][i], 12);
 			}
 			else if (board[j][i]<0)
 			{
+				cout << " ";
 				CprintNum(-board[j][i], 9);
 			}
-			printf("    ");
+			printf("  ");
 		}
-		printf("┆\n┆                                ┆\n");
+		Cprintf("┆\n",15);
+
+		Cprintf("┆  ┆", 15);
+		for (int i = 0; i < SIZE; i++)
+		{
+			Cprintf("    ", 15);
+		}
+		Cprintf("  ┆\n", 15);
 
 	}
-	Cprintf("┆                                ┆\n", 15);
-	Cprintf("└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘\n", 15);
+	Cprintf("└┄┴", 15);
+	for (int i = 0; i < SIZE; i++)
+	{
+		Cprintf("┄┄", 15);
+	}
+	Cprintf("┄", 15);
+	Cprintf("┘\n", 15);
 }
 void Board::Show()
 {
-	cout << "\n-----------------\n   1  2  3  4  5\n";
+	cout << "\n--";
+	for (int i = 0; i < SIZE; i++)
+		cout << "---";
+	cout << "\n ";
+	for (int i = 0; i < SIZE; i++)
+	{
+		cout <<"  "<< i + 1;
+	}
+	cout<<"\n";
+
 	for (int i = 0; i<SIZE; i++)
 	{
 		cout << i + 1;
@@ -105,7 +164,9 @@ void Board::Show()
 		}
 		cout << "\n";
 	}
-	cout << "\n-----------------\n";
+	for (int i = 0; i < SIZE; i++)
+		cout << "---";
+	cout << "--\n ";
 }
 int Board::Winner()
 {
@@ -130,6 +191,7 @@ int Board::Winner()
 		return RED;
 	return 0;
 }
+
 
 void Board::DefineFormation(int faction, int formation)
 {
@@ -282,121 +344,120 @@ int Board::GetSmallerPiece(int piece)
 }
 
 
-
-int Board::GetAllMoves(Move Moves[6],int Piece)
+int Board::GetAllMoves(Move moves[6], int piece)
 {
-	int Direction[3][2] = {{1,0},{1,1},{0,1}};
-	int MoveNum = 0;
-	if(GetPieceLife(Piece)==true)//如果棋子还存在
+	int direction[3][2] = { { 1, 0 }, { 1, 1 }, { 0, 1 } };
+	int move_num = 0;
+	if (GetPieceLife(piece) == true)
 	{
-		Loc pLoc = GetPieceLoc(Piece);//先得到棋子的坐标
-		int f = GetPieceFaction(Piece);//再得到棋子的阵营
-		for(int i=0;i<3;i++)//向3个方向检查
+		Loc p_loc = GetPieceLoc(piece);
+		int f = GetPieceFaction(piece);
+		for (int i = 0; i<3; i++)
 		{
-			Loc nLoc;//位移后的棋子坐标
-			nLoc.x = pLoc.x + f*Direction[i][0];//向量相加
-			nLoc.y = pLoc.y + f*Direction[i][1];//向量相加
-			if(GetLocLegality(nLoc)==true)//判断位移后的棋子坐标是否合法
+			Loc new_loc;
+			new_loc.x = p_loc.x + f*direction[i][0];
+			new_loc.y = p_loc.y + f*direction[i][1];
+			if (GetLocLegality(new_loc) == true)
 			{
-				Moves[MoveNum].Loc =nLoc;//合法的话，加入招式的数组中
-				Moves[MoveNum].Piece=Piece;
-				MoveNum++;//招式总数自增1
+				moves[move_num].loc = new_loc;
+				moves[move_num].piece = piece;
+				move_num++;
 			}
 		}
 	}
 	else
 	{
-		int s=GetSmallerPiece(Piece);
-		int l=GetLargerPiece(Piece);
-		int f = GetPieceFaction(Piece);
-		if(s!=0&&l!=0)
+		int s = GetSmallerPiece(piece);
+		int l = GetLargerPiece(piece);
+		int f = GetPieceFaction(piece);
+		if (s != 0 && l != 0)
 		{
-			//先处理s的数据
-			Loc pLoc = GetPieceLoc(s);
-			for(int i=0;i<3;i++)
+			//dead s first
+			Loc p_loc = GetPieceLoc(s);
+			for (int i = 0; i<3; i++)
 			{
-				Loc nLoc;
-				nLoc.x = pLoc.x + f*Direction[i][0];
-				nLoc.y = pLoc.y + f*Direction[i][1];
-				if(GetLocLegality(nLoc)==true)
+				Loc new_loc;
+				new_loc.x = p_loc.x + f*direction[i][0];
+				new_loc.y = p_loc.y + f*direction[i][1];
+				if (GetLocLegality(new_loc) == true)
 				{
-					Moves[MoveNum].Loc=nLoc;
-					Moves[MoveNum].Piece=s;
-					MoveNum++;
+					moves[move_num].loc = new_loc;
+					moves[move_num].piece = s;
+					move_num++;
 				}
 			}
-			//再处理l的数据
-			pLoc = GetPieceLoc(l);
-			for(int i=0;i<3;i++)
+			//dead l
+			p_loc = GetPieceLoc(l);
+			for (int i = 0; i<3; i++)
 			{
-				Loc nLoc;
-				nLoc.x = pLoc.x + f*Direction[i][0];
-				nLoc.y = pLoc.y + f*Direction[i][1];
-				if(GetLocLegality(nLoc)==true)
+				Loc new_loc;
+				new_loc.x = p_loc.x + f*direction[i][0];
+				new_loc.y = p_loc.y + f*direction[i][1];
+				if (GetLocLegality(new_loc) == true)
 				{
-					Moves[MoveNum].Loc=nLoc;
-					Moves[MoveNum].Piece=l;
-					MoveNum++;
+					moves[move_num].loc = new_loc;
+					moves[move_num].piece = l;
+					move_num++;
 				}
 			}
 		}
-		if(s==0&&l!=0)
+		if (s == 0 && l != 0)
 		{
-			Loc pLoc = GetPieceLoc(l);
-			for(int i=0;i<3;i++)
+			Loc p_loc = GetPieceLoc(l);
+			for (int i = 0; i<3; i++)
 			{
-				Loc nLoc;
-				nLoc.x = pLoc.x + f*Direction[i][0];
-				nLoc.y = pLoc.y + f*Direction[i][1];
-				if(GetLocLegality(nLoc)==true)
+				Loc new_loc;
+				new_loc.x = p_loc.x + f*direction[i][0];
+				new_loc.y = p_loc.y + f*direction[i][1];
+				if (GetLocLegality(new_loc) == true)
 				{
-					Moves[MoveNum].Loc=nLoc;
-					Moves[MoveNum].Piece=l;
-					MoveNum++;
+					moves[move_num].loc = new_loc;
+					moves[move_num].piece = l;
+					move_num++;
 				}
 			}
 		}
-		if(s!=0&&l==0)
+		if (s != 0 && l == 0)
 		{
-			Loc pLoc = GetPieceLoc(s);
-			for(int i=0;i<3;i++)
+			Loc p_loc = GetPieceLoc(s);
+			for (int i = 0; i<3; i++)
 			{
-				Loc nLoc;
-				nLoc.x = pLoc.x + f*Direction[i][0];
-				nLoc.y = pLoc.y + f*Direction[i][1];
-				if(GetLocLegality(nLoc)==true)
+				Loc new_loc;
+				new_loc.x = p_loc.x + f*direction[i][0];
+				new_loc.y = p_loc.y + f*direction[i][1];
+				if (GetLocLegality(new_loc) == true)
 				{
-					Moves[MoveNum].Loc=nLoc;
-					Moves[MoveNum].Piece=s;
-					MoveNum++;
+					moves[move_num].loc = new_loc;
+					moves[move_num].piece = s;
+					move_num++;
 				}
 			}
 		}
-		if(s==0&&l==0)
-			cout<<"GetPossibleRooks函数出错，不存在任何棋子";
+		if (s == 0 && l == 0)
+			cout << "WARNING:Wrong Func<GetAllMoves>";
 	}
-	return MoveNum;
+	return move_num;
 }
-
-
-
-
-bool Board::GetLocationThreat(Loc pLoc,int faction)
+bool Board::GetLocationThreat(Loc p_loc, int faction)
 {
-	//获得某方在某个位置上是否受到直接的威胁。范围值为true or false
-	int Direction[3][2] = {{1,0},{1,1},{0,1}};
-	for(int i=0;i<3;i++)
+	//return whether the piece in p_loc is threatened by his opponent
+	int direction[3][2] = { { 1, 0 }, { 1, 1 }, { 0, 1 } };
+	for (int i = 0; i<3; i++)
 	{
 		Loc nLoc;
-		nLoc.x = pLoc.x+(faction*Direction[i][0]);
-		nLoc.y = pLoc.y+(faction*Direction[i][1]);
-		if(GetPieceFaction(board[pLoc.x][pLoc.y])==-faction)
+		nLoc.x = p_loc.x + (faction*direction[i][0]);
+		nLoc.y = p_loc.y + (faction*direction[i][1]);
+		if (GetPieceFaction(board[p_loc.x][p_loc.y]) == -faction)
 		{
 			return true;
 		}
 	}
 	return false;
 }
+
+/*
+
+
 //Filter
 int Board::GetPieceFilterMoves(Move Moves[3],int Piece)
 {	
@@ -801,7 +862,7 @@ int Board::GetFixFilterMoves(Move Moves[6],int Piece)
 	}
 	return MoveNum;
 }
-
+*/
 
 
 
@@ -858,7 +919,50 @@ bool GetFormationLegality(int asp)
 	}
 	return false;
 }
-
+void PrintPiece(sint piece)
+{
+	switch (piece)
+	{
+	case 1:
+		Cprintf("①", 12);
+		break;
+	case 2:
+		Cprintf("②", 12);
+		break;
+	case 3:
+		Cprintf("③", 12);
+		break;
+	case 4:
+		Cprintf("④", 12);
+		break;
+	case 5:
+		Cprintf("⑤", 12);
+		break;
+	case 6:
+		Cprintf("⑥", 12);
+		break;
+	case -1:
+		Cprintf("①", 9);
+		break;
+	case -2:
+		Cprintf("②", 9);
+		break;
+	case -3:
+		Cprintf("③", 9);
+		break;
+	case -4:
+		Cprintf("④", 9);
+		break;
+	case -5:
+		Cprintf("⑤", 9);
+		break;
+	case -6:
+		Cprintf("⑥", 9);
+		break;
+	default:
+		break;
+	}
+}
 void Cprintf(char* str, WORD color, ...) {
 	WORD colorOld;
 	HANDLE handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
@@ -885,6 +989,6 @@ void Cprintf(char* str, WORD color, ...) {
 void CprintNum(int num, int color)
 {
 	char str[4];
-	sprintf(str,"%d",Num);
+	sprintf_s(str,"%d",num);
 	Cprintf(str,color);
 }

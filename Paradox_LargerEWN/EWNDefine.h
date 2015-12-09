@@ -10,7 +10,7 @@ enum PIECE
 	BLUE = -1
 };
 
-#define SIZE 10
+#define SIZE 8
 typedef short sint;
 using BoardArray = sint[SIZE][SIZE];
 
@@ -37,15 +37,7 @@ public:
 		loc.Set(lx, ly);
 		piece = lp;
 	}
-	void Move::Show()
-	{
-		cout << "Location(" << loc.x + 1 << " " << loc.y + 1 << ") Piece ";
-		if (piece>0)
-			CprintNum(piece,12);
-		else
-			CprintNum(-piece,9);
-		cout << endl;
-	}
+	void Show();
 };
 
 //define chessboard class
@@ -114,5 +106,6 @@ public:
 int RndDice();
 int RndFormation();
 bool GetFormationLegality(int asp);
+void PrintPiece(sint piece);
 void Cprintf(char* str, WORD color, ...);
 void CprintNum(int num,int color);

@@ -27,7 +27,7 @@
     <ClInclude Include="EWNDefine.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Paradox.h">
+    <ClInclude Include="MCTS.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -41,7 +41,7 @@
     <ClCompile Include="EWNDefine.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Paradox.cpp">
+    <ClCompile Include="MCTS.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

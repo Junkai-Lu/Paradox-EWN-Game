@@ -4,11 +4,7 @@
 #pragma  once
 
 #define MC_CONSTANT 30000				//蒙特卡罗模拟常数
-#define GUMC_CONSTANT 10000				//蒙特卡罗评估常数
-#define ESTIMATE_CONSTANT 10000			//开局测试常数
 #define FILTER_MC_CONSTANT 10000		//FILTER算法常数
-#define FIX_FILTER_MC_CONSTANT 10000	//FILTER算法常数
-#define BOARD_TEST_CONSTANT 20000		//开局测试常数
 
 #define UCT_MC_TIMES 1					//UCT中的MC评价常数
 #define UCT_TIMES 10000000				//UCT迭代的次数
