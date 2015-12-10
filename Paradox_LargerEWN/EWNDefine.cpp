@@ -10,7 +10,7 @@ using namespace std;
 
 void Move::Show()
 {
-	std::cout << "Location(" << loc.x + 1 << " " << loc.y + 1 << ") Piece ";
+	std::cout << "Location(" << x + 1 << " " << y + 1 << ") Piece ";
 	if (piece>0)
 		CprintNum(piece, 12);
 	else
@@ -26,7 +26,7 @@ Board::Board()
 	step =0;
 	Init();
 }
-Board::Board(BoardArray b_arr, Move b_move, short b_step)
+Board::Board(BoardArray &b_arr, Move &b_move, short b_step)
 {
 	step = b_step;
 	SetBoard(b_arr);
@@ -41,20 +41,20 @@ void Board::GameMove(Loc move_loc, int piece)
 	board[old_loc.x][old_loc.y] = EMPTY;
 	board[move_loc.x][move_loc.y] = piece;
 }
-void Board::GameMove(Move move)
+void Board::GameMove(Move &move)
 {
 	step++;
 	Loc old_loc = GetPieceLoc(move.piece);
 	board[old_loc.x][old_loc.y] = EMPTY;
-	board[move.loc.x][move.loc.y] = move.piece;
+	board[move.x][move.y] = move.piece;
 }
-void Board::SetBoard(BoardArray board_array)
+void Board::SetBoard(BoardArray &board_array)
 {
 	for (int i = 0; i<SIZE; i++)
 		for (int j = 0; j<SIZE; j++)
 			board[j][i] = board_array[j][i];
 }
-void Board::Print()
+void Board::Print() const
 {
 	Cprintf("\n©°©¨©Ð", 15);
 	for (int i = 0; i < SIZE;i++)
@@ -137,7 +137,7 @@ void Board::Print()
 	Cprintf("©¨", 15);
 	Cprintf("©¼\n", 15);
 }
-void Board::Show()
+void Board::Show() const
 {
 	cout << "\n--";
 	for (int i = 0; i < SIZE; i++)
@@ -168,7 +168,7 @@ void Board::Show()
 		cout << "---";
 	cout << "--\n ";
 }
-int Board::Winner()
+int Board::Winner() const
 {
 	if (board[0][0] < 0)
 		return BLUE;
@@ -249,7 +249,7 @@ void Board::Init()
 	board[SIZE - 2][SIZE - 2] = -5;
 	board[SIZE - 1][SIZE - 3] = -6;
 }
-Loc Board::GetPieceLoc(int piece)
+Loc Board::GetPieceLoc(int piece) const
 {
 	Loc new_loc;
 	for(int i =0;i<SIZE;i++)
@@ -266,7 +266,7 @@ Loc Board::GetPieceLoc(int piece)
 	new_loc.Set(0, 0);
 	return new_loc;
 }
-bool Board::GetPieceLife(int piece)
+bool Board::GetPieceLife(int piece) const
 {
 	for(int i =0;i<SIZE;i++)
 	{
@@ -278,13 +278,13 @@ bool Board::GetPieceLife(int piece)
 	}
 	return false;
 }
-bool Board::GetLocLegality(Loc loc)
+bool Board::GetLocLegality(Loc loc) const
 {
 	if(loc.x>=0&&loc.x<=SIZE-1&&loc.y>=0&&loc.y<=SIZE-1)
 		return true;
 	return false;
 }
-int Board::GetPieceFaction(int piece)
+int Board::GetPieceFaction(int piece) const
 {
 	if(piece>0)
 		return RED;
@@ -292,7 +292,7 @@ int Board::GetPieceFaction(int piece)
 		return BLUE;
 	return 0;
 }
-int Board::GetLargerPiece(int piece)
+int Board::GetLargerPiece(int piece) const
 {
 	if(piece>0)
 	{
@@ -317,7 +317,7 @@ int Board::GetLargerPiece(int piece)
 		return 0;
 	}
 }
-int Board::GetSmallerPiece(int piece)
+int Board::GetSmallerPiece(int piece) const
 {
 	if(piece>0)
 	{
@@ -344,7 +344,7 @@ int Board::GetSmallerPiece(int piece)
 }
 
 
-int Board::GetAllMoves(Move moves[6], int piece)
+int Board::GetAllMoves(Move moves[6], int piece) const
 {
 	int direction[3][2] = { { 1, 0 }, { 1, 1 }, { 0, 1 } };
 	int move_num = 0;
@@ -359,8 +359,7 @@ int Board::GetAllMoves(Move moves[6], int piece)
 			new_loc.y = p_loc.y + f*direction[i][1];
 			if (GetLocLegality(new_loc) == true)
 			{
-				moves[move_num].loc = new_loc;
-				moves[move_num].piece = piece;
+				moves[move_num].Set(new_loc.x, new_loc.y, piece);
 				move_num++;
 			}
 		}
@@ -381,8 +380,7 @@ int Board::GetAllMoves(Move moves[6], int piece)
 				new_loc.y = p_loc.y + f*direction[i][1];
 				if (GetLocLegality(new_loc) == true)
 				{
-					moves[move_num].loc = new_loc;
-					moves[move_num].piece = s;
+					moves[move_num].Set(new_loc.x, new_loc.y, s);
 					move_num++;
 				}
 			}
@@ -395,8 +393,7 @@ int Board::GetAllMoves(Move moves[6], int piece)
 				new_loc.y = p_loc.y + f*direction[i][1];
 				if (GetLocLegality(new_loc) == true)
 				{
-					moves[move_num].loc = new_loc;
-					moves[move_num].piece = l;
+					moves[move_num].Set(new_loc.x, new_loc.y, l);
 					move_num++;
 				}
 			}
@@ -411,8 +408,7 @@ int Board::GetAllMoves(Move moves[6], int piece)
 				new_loc.y = p_loc.y + f*direction[i][1];
 				if (GetLocLegality(new_loc) == true)
 				{
-					moves[move_num].loc = new_loc;
-					moves[move_num].piece = l;
+					moves[move_num].Set(new_loc.x, new_loc.y, l);
 					move_num++;
 				}
 			}
@@ -427,8 +423,7 @@ int Board::GetAllMoves(Move moves[6], int piece)
 				new_loc.y = p_loc.y + f*direction[i][1];
 				if (GetLocLegality(new_loc) == true)
 				{
-					moves[move_num].loc = new_loc;
-					moves[move_num].piece = s;
+					moves[move_num].Set(new_loc.x, new_loc.y, s);
 					move_num++;
 				}
 			}
@@ -438,7 +433,7 @@ int Board::GetAllMoves(Move moves[6], int piece)
 	}
 	return move_num;
 }
-bool Board::GetLocationThreat(Loc p_loc, int faction)
+bool Board::GetLocationThreat(Loc p_loc, int faction) const
 {
 	//return whether the piece in p_loc is threatened by his opponent
 	int direction[3][2] = { { 1, 0 }, { 1, 1 }, { 0, 1 } };
