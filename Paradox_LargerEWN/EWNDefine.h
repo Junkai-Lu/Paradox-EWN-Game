@@ -59,12 +59,17 @@ public:
 	void SetBoard(BoardArray &board_array);					//set the board
 	void Print() const;										//print the board
 	void Show() const;										//a simpilified print
-	int Winner() const;											//return the winner of this board.	
+	int Winner() const;										//return the winner of this board.	
 	void DefineFormation(int faction, int formation);		//define the initial piece formation
+	void CopyBoardArray(BoardArray &dest);					//copy board array to dest.
 
 	inline void StepAdd()
 	{
 		step++;
+	}
+	inline void SetStep(short s)
+	{
+		step = s;
 	}
 	inline void Define(int x, int y, int value)
 	{
@@ -90,10 +95,10 @@ private:
 	int GetPieceFaction(int piece) const;					//return the faction of piece.
 	int GetLargerPiece(int piece) const;					//return a piece with a larger number which is alive. 
 	int GetSmallerPiece(int piece) const;					//return a piece with a smaller number which is alive. 
+	
 
 public:
-	
-	int GetAllMoves(Move Moves[6],int Piece) const;
+	int GetAllMoves(Move moves[6],int Piece) const;
 	bool GetLocationThreat(Loc pLoc,int faction) const;
 	int GetPieceFilterMoves(Move Moves[3],int Piece);
 	int GetFilterMoves(Move Moves[6],int Piece);

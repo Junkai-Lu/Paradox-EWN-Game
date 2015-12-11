@@ -226,6 +226,12 @@ void Board::DefineFormation(int faction, int formation)
 		Define(SIZE - 1, SIZE - 3, -six);
 	}
 }
+void Board::CopyBoardArray(BoardArray &dest)
+{
+	for (int i = 0; i<SIZE; i++)
+		for (int j = 0; j<SIZE; j++)
+			dest[j][i] = board[j][i];
+}
 
 //private
 void Board::Init()
@@ -344,6 +350,7 @@ int Board::GetSmallerPiece(int piece) const
 }
 
 
+//public
 int Board::GetAllMoves(Move moves[6], int piece) const
 {
 	int direction[3][2] = { { 1, 0 }, { 1, 1 }, { 0, 1 } };

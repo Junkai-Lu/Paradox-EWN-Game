@@ -20,8 +20,15 @@ class MctsMove :public Move
 class PureMC
 {
 public:
-	sint piece;
-	Board *aim;
+	sint dest_piece;
+	Board *dest_board;
 
-	PureMC(Board *dest, sint next_piece);
+	PureMC(Board *board, sint piece);
+
+
+protected:
+	void RndMove(Board &dest, sint piece);
+
+public:
+	sint SingleSimulation(Board &dest, sint next_player);
 };

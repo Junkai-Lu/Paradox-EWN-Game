@@ -12,6 +12,8 @@
 #include "EWNDefine.h"
 #include "MCTS.h"
 
+using namespace std;
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	Board CB;
@@ -19,6 +21,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	double totaltime;		
 	srand((unsigned)time(NULL));//srand
 	CB.Show();
+
+	PureMC MC(&CB, 1);
+	cout << MC.SingleSimulation(CB, RED);
 	return 0;
 
 
