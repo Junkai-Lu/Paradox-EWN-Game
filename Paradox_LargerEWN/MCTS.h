@@ -24,13 +24,42 @@ public:
 	Board *dest_board;
 
 	PureMC(Board *board, sint piece);
-	const int MC_TIMES = 20000;
+	void MonteCarloMove(Board &dest, sint piece, bool move_msg);
 
 protected:
 	void RndMove(Board &dest, sint piece);
-
-public:
 	sint SingleSimulation(Board &dest, sint next_player);
 	float MultipleSimulation(Board &dest, sint next_player, sint winner, int times);
-	void MonteCarloMove(Board &dest, sint piece, bool move_msg);
+
+private:
+	const int MC_TIMES = 20000;
+};
+
+class MctsNode :Board
+{
+public:
+	//func
+	MctsNode();
+	
+	//data
+	sint owner;					//the owner of this node, but also the player who is making decision.
+	sint winner;				//the winner of this node if it is finite state.
+	float avg_value;			//the avg winner rate for the parent of this node.
+	MctsMove *piece_move[6];	//storage all avaliable moves.
+
+private:
+	//func
+
+
+	//data
+	bool piece_aLive[6];		//whether the six piece of owner alive
+	int visited_times;			//how manyy times this node have been visited.
+	sint exist_child[7];		//existed child for each avaliable piece.
+	sint maxium_child[6];		//maxium child for each avaliable piece.
+	
+};
+
+class StandardMCTS :public PureMC
+{
+	StandardMCTS(Board *board, sint piece);
 };

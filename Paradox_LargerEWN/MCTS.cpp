@@ -77,3 +77,4 @@ void PureMC::MonteCarloMove(Board &dest, sint piece,bool move_msg)
 	}
 	dest.GameMove(moves[best_move_num]);
 }
+
