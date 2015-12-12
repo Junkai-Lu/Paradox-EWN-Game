@@ -86,20 +86,20 @@ public:
 		return false;
 	}
 	
-
-private:
-	void Init();											//initialized board with formation 123456
+	int GetPieceFaction(int piece) const;					//return the faction of piece.
 	Loc GetPieceLoc(int piece) const;						//return the loction of piece.
 	bool GetPieceLife(int piece) const;						//return whether the piece alive.
 	bool GetLocLegality(Loc loc) const;						//return whether the location is legal.
-	int GetPieceFaction(int piece) const;					//return the faction of piece.
+
+private:
+	void Init();											//initialized board with formation 123456
 	int GetLargerPiece(int piece) const;					//return a piece with a larger number which is alive. 
 	int GetSmallerPiece(int piece) const;					//return a piece with a smaller number which is alive. 
-	
+	bool GetLocationThreat(Loc pLoc, int faction) const;
 
 public:
 	int GetAllMoves(Move moves[6],int Piece) const;
-	bool GetLocationThreat(Loc pLoc,int faction) const;
+	
 	int GetPieceFilterMoves(Move Moves[3],int Piece);
 	int GetFilterMoves(Move Moves[6],int Piece);
 	int GetPieceFixFilterMoves(Move Moves[3],int Piece);

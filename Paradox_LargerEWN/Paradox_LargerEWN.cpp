@@ -23,7 +23,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	CB.Show();
 
 	PureMC MC(&CB, 1);
-	cout << MC.SingleSimulation(CB, RED);
+	cout << MC.MultipleSimulation(CB, RED,RED,100000);
+
+	CB.Show();
 	return 0;
 
 

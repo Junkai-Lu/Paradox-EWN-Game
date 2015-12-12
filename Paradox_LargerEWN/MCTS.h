@@ -24,11 +24,13 @@ public:
 	Board *dest_board;
 
 	PureMC(Board *board, sint piece);
-
+	const int MC_TIMES = 20000;
 
 protected:
 	void RndMove(Board &dest, sint piece);
 
 public:
 	sint SingleSimulation(Board &dest, sint next_player);
+	float MultipleSimulation(Board &dest, sint next_player, sint winner, int times);
+	void MonteCarloMove(Board &dest, sint piece, bool move_msg);
 };

@@ -46,3 +46,34 @@ sint PureMC::SingleSimulation(Board &dest, sint next_player)
 	dest.SetBoard(temp_board);
 	return 0;
 }
+float PureMC::MultipleSimulation(Board &dest, sint next_player, sint winner, int times)
+{
+	int win_times = 0;
+	for (int i = 0; i<times; i++)
+	{
+		if (SingleSimulation(dest, next_player) == winner)
+			win_times++;
+	}
+	float Result = (float)win_times / (float)times;
+	return Result;
+}
+void PureMC::MonteCarloMove(Board &dest, sint piece,bool move_msg)
+{
+	int f = dest.GetPieceFaction(piece);
+	Move moves[6];
+	int MoveNum = dest.GetAllMoves(moves, piece);
+	float best_val = -1;
+	int best_move_num = 0;
+	for (int i = 0; i<MoveNum; i++)
+	{
+		Board test_board = dest;
+		test_board.GameMove(moves[i]);
+		float val = MultipleSimulation(test_board, -f, f, MC_TIMES);
+		if (val >= best_val)
+		{
+			best_val = val;
+			best_move_num = i;
+		}
+	}
+	dest.GameMove(moves[best_move_num]);
+}
