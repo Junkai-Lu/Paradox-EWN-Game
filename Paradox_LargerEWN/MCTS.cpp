@@ -78,3 +78,11 @@ void PureMC::MonteCarloMove(Board &dest, sint piece,bool move_msg)
 	dest.GameMove(moves[best_move_num]);
 }
 
+
+MctsNode::MctsNode(sint next_player) :Board()
+{
+	owner = next_player;
+	winner = Winner();
+	avg_value = 0;
+	visited_times = 1;
+}

@@ -39,7 +39,8 @@ class MctsNode :Board
 {
 public:
 	//func
-	MctsNode();
+	MctsNode(sint next_player);
+	MctsNode(sint next_player, BoardArray &b_arr, Move &b_move, short b_step);
 	
 	//data
 	sint owner;					//the owner of this node, but also the player who is making decision.
@@ -52,9 +53,9 @@ private:
 
 
 	//data
-	bool piece_aLive[6];		//whether the six piece of owner alive
+	bool piece_alive[6];		//whether the six piece of owner alive
 	int visited_times;			//how manyy times this node have been visited.
-	sint exist_child[7];		//existed child for each avaliable piece.
+	sint exist_child[6];		//existed child for each avaliable piece.
 	sint maxium_child[6];		//maxium child for each avaliable piece.
 	
 };
