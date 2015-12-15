@@ -50,7 +50,7 @@ public:
 
 private:
 	//func
-
+	float GetUCBValue(int total_times);
 
 	//data
 	bool piece_alive[6];		//whether the six piece of owner alive

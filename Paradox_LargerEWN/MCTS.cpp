@@ -86,3 +86,8 @@ MctsNode::MctsNode(sint next_player) :Board()
 	avg_value = 0;
 	visited_times = 1;
 }
+float MctsNode::GetUCBValue(int total_times)
+{
+	float exploitation = sqrt((((log10((float)total_times)) * 2) / (float)visited_times));
+	return avg_value + exploitation;
+}
